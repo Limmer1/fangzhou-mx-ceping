@@ -1,5 +1,5 @@
 #!/bin/bash
-# 方舟Coding众测 检查点验证脚本
+# 方舟模型众测 检查点验证脚本
 # 用法：bash scripts/check_completion.sh
 # 说明：验证各步骤是否完成，确认后删除临时文件 .check_status（不是删脚本本身）
 
@@ -10,7 +10,7 @@ EXPECTED_CHECKS=(
   "TASK_DESIGNED"
   "DOWNLOAD_DONE"
   "UNZIP_DONE"
-  "SERVERS_STARTED"
+  "ENV_READY"
   "TEST_DONE"
   "SCORING_DONE"
   "REPORT_DONE"
@@ -29,7 +29,7 @@ for check in "${EXPECTED_CHECKS[@]}"; do
   fi
 done
 
-echo "=== 方舟Coding众测 检查点验证 ==="
+echo "=== 方舟模型众测 检查点验证 ==="
 echo ""
 
 if [ ${#MISSING[@]} -eq 0 ]; then
@@ -44,7 +44,7 @@ else
       TASK_DESIGNED) echo "  ❌ 步骤1：任务设计未完成" ;;
       DOWNLOAD_DONE) echo "  ❌ 步骤2：产物未下载" ;;
       UNZIP_DONE) echo "  ❌ 步骤3：解压未完成" ;;
-      SERVERS_STARTED) echo "  ❌ 步骤4：服务未启动" ;;
+      ENV_READY) echo "  ❌ 步骤4：验证环境未准备" ;;
       TEST_DONE) echo "  ❌ 步骤5：测试未完成" ;;
       SCORING_DONE) echo "  ❌ 步骤6：评分未完成" ;;
       REPORT_DONE) echo "  ❌ 步骤7：报告未生成" ;;
@@ -60,9 +60,9 @@ echo ""
 if grep -q "^SCORING_DONE$" "$STATUS_FILE" 2>/dev/null; then
   echo "--- 评分完整性检查 ---"
   echo "请确认："
-  echo "  - [ ] 封顶规则已逐条检查"
-  echo "  - [ ] 最高分 - 最低分 >= 2（分差验证）"
-  echo "  - [ ] 圈选评论包含 文件名:行号 + 具体代码"
+  echo "  - [ ] 产物质量和执行过程均按平台 1–10 分标准评分"
+  echo "  - [ ] 圈选评论使用与任务类型匹配的真实证据位置"
+  echo "  - [ ] 模型顺序与编号文件夹一致"
   echo "  - [ ] 评价用大白话写，对着截图文件名"
   echo ""
 fi
