@@ -77,9 +77,7 @@ source: "https://bytedance.larkoffice.com/docx/VKzLdALYIoWvyKx8712cSmn2nxf?from=
 
 # 任务快捷入口
 
-在下面的卡片中切换任务，可以快速打开对应的平台页面和结果提交表单。
-
-[打开本地任务快捷卡片](<./任务书素材/任务快捷入口.html>)
+请通过上方“你的任务”表格中的平台入口打开对应任务，结果提交表单见前文。
 
 # 下载附件
 
