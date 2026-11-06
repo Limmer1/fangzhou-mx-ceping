@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rubric 专家校准工作台</title>
+  <style>
+    :root{
+      color-scheme:light;--bg:#f3f5f8;--surface:#fff;--soft:#f7f8fb;--text:#172033;--muted:#667085;
+      --line:#d8deea;--brand:#3157d5;--brand-soft:#edf1ff;--green:#16794b;--green-soft:#eaf7f0;
+      --orange:#955300;--orange-soft:#fff4df;--red:#b42318;--red-soft:#fff0ee;--purple:#6941c6;
+      --purple-soft:#f3efff;--radius:15px;--shadow:0 10px 28px rgba(24,35,65,.07)
+    }
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6}
+    button,input,select,textarea{font:inherit}button,input[type=file],select{min-height:40px}button{cursor:pointer}h1{font-size:clamp(28px,4vw,42px);line-height:1.2;margin:5px 0 8px}h2{font-size:23px;margin:0 0 6px}h3{font-size:17px;margin:0}p{margin:0}
+    .shell{max-width:1500px;margin:0 auto;padding:28px 22px 90px}.hero{padding:28px;border-radius:23px;color:#fff;background:linear-gradient(135deg,#18264b,#304fc1 72%,#5876e6);box-shadow:var(--shadow)}
+    .eyebrow{font-size:13px;letter-spacing:.08em;opacity:.78}.hero p{color:rgba(255,255,255,.84);max-width:900px}.hero-meta,.quick-links,.actions,.decision-row{display:flex;flex-wrap:wrap;gap:8px}.hero-meta{margin-top:18px}.hero-meta span{font-size:12px;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.17)}.quick-links{margin-top:18px}.hero-link{display:inline-flex;align-items:center;min-height:40px;padding:8px 13px;border-radius:9px;background:#fff;color:#213b91;text-decoration:none;font-weight:650}.hero-link.secondary{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28)}
+    .notice{margin-top:16px;padding:13px 15px;background:var(--orange-soft);border-left:4px solid #df8610;border-radius:9px;color:#6b3c00}.panel,.directory,.rule-card,.form-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 3px 14px rgba(24,35,65,.035)}.panel{padding:19px}
+    .load-grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:18px}.upload-box{display:grid;gap:10px}.upload-box input{width:100%}.package-state{min-height:28px;font-size:13px;color:var(--muted)}.package-state.ok{color:var(--green)}.package-state.error{color:var(--red)}.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#aeb6c5;margin-right:7px}.status-dot.ok{background:var(--green)}.status-dot.error{background:var(--red)}
+    .workspace{display:none}.workspace.ready{display:block}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:22px 0 16px}.tab,.btn{border:1px solid #c8d0df;border-radius:9px;background:#fff;color:var(--text);padding:8px 13px;text-decoration:none}.tab.active,.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}.btn.danger{color:var(--red);border-color:#efb7b1}.btn:disabled{opacity:.45;cursor:not-allowed}[hidden]{display:none!important}
+    .section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:15px}.section-head p{color:var(--muted)}.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}.summary{padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px}.summary span{display:block;color:var(--muted);font-size:12px}.summary strong{display:block;margin-top:3px;font-size:17px;overflow-wrap:anywhere}.text-view{white-space:pre-wrap;overflow-wrap:anywhere;max-height:600px;overflow:auto;background:var(--soft);border-radius:10px;padding:14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+    input[type=text],input[type=search],select,textarea{width:100%;border:1px solid #c8d0df;border-radius:9px;background:#fff;color:var(--text);padding:8px 10px}textarea{min-height:110px;resize:vertical}input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid rgba(49,87,213,.2);outline-offset:1px}.small{font-size:13px;color:var(--muted)}.field{display:grid;gap:6px}.field label{font-size:13px;font-weight:650}.required{color:var(--red)}
+    .review-topline{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}.review-topline .small{max-width:760px}.review-layout{display:grid;grid-template-columns:minmax(290px,.78fr) minmax(340px,1fr) minmax(360px,1.05fr);gap:14px;align-items:start}.review-layout>*{min-width:0}.directory,.rule-card,.form-card{min-height:560px}.directory{padding:14px;max-height:calc(100vh - 130px);overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;position:sticky;top:12px}.directory-tools{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:8px;margin:11px 0}.dimension-group{min-width:0;border-top:1px solid var(--line);padding-top:11px;margin-top:11px}.dimension-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;margin-bottom:8px}.dimension-head strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.dimension-count{flex:0 0 auto;font-size:12px;color:var(--muted);white-space:nowrap}.rule-directory-list{display:grid;min-width:0;gap:6px}.directory-item{display:grid;grid-template-columns:12px minmax(0,1fr) max-content;gap:8px;align-items:center;min-width:0;width:100%;overflow:hidden;border:1px solid transparent;border-radius:9px;background:transparent;padding:8px;text-align:left;color:var(--text)}.directory-item:hover{background:var(--soft)}.directory-item.current{border-color:#9cb2ff;background:var(--brand-soft)}.directory-item .status{width:9px;height:9px;border-radius:50%;background:#b7bfcc}.directory-item.complete .status{background:var(--green)}.directory-item.invalid .status{background:var(--red)}.directory-item .item-copy{display:block;min-width:0;width:100%;overflow:hidden}.directory-item .item-id,.directory-item .item-text{display:block;min-width:0;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.directory-item .item-id{font-size:12px;font-weight:700;line-height:1.45}.directory-item .item-text{font-size:12px;line-height:1.45;color:var(--muted)}.directory-item .item-state{align-self:start;min-width:2.5em;padding-top:1px;text-align:right;white-space:nowrap;font-size:11px;color:var(--muted)}.directory-item.complete .item-state{color:var(--green)}.directory-item.invalid .item-state{color:var(--red)}
+    .rule-card,.form-card{position:sticky;top:12px;align-self:start}.rule-card{padding:20px;max-height:calc(100vh - 130px);overflow:auto}.rule-index{font-size:12px;color:var(--muted);margin-bottom:9px}.rule-title{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:15px}.badge{display:inline-flex;align-items:center;border-radius:999px;background:var(--soft);color:var(--muted);font-size:12px;padding:3px 8px}.badge.must{background:var(--red-soft);color:var(--red)}.badge.key{background:var(--orange-soft);color:var(--orange)}.rule-copy{font-size:15px;white-space:pre-wrap;overflow-wrap:anywhere}.plain-copy{margin-top:15px;padding:11px 12px;border-radius:9px;background:var(--brand-soft);color:#2f438c;font-size:13px}.guidance{margin-top:20px;padding-top:15px;border-top:1px solid var(--line)}.guidance h3{margin-bottom:9px}.guidance ul{margin:0;padding-left:20px;color:var(--muted);font-size:13px}.guidance li+li{margin-top:5px}
+    .form-card{display:flex;flex-direction:column;max-height:calc(100vh - 130px);overflow:hidden}.form-scroll{padding:20px;overflow:auto}.decision-row{margin:12px 0 10px}.choice{position:relative}.choice input{position:absolute;opacity:0;pointer-events:none}.choice span{display:inline-flex;align-items:center;min-height:38px;padding:6px 12px;border:1px solid #c8d0df;border-radius:8px;background:#fff}.choice input:checked+span{border-color:var(--brand);background:var(--brand-soft);color:#2444ac;font-weight:650}.choice[data-value=keep] input:checked+span{border-color:#67a989;background:var(--green-soft);color:var(--green)}.choice[data-value=remove] input:checked+span{border-color:#e4a29c;background:var(--red-soft);color:var(--red)}.choice[data-value=unsure] input:checked+span{border-color:#c0abe9;background:var(--purple-soft);color:var(--purple)}.dynamic-fields{display:grid;gap:14px}.empty-form{padding:24px;border:1px dashed #bdc6d5;border-radius:10px;background:var(--soft);text-align:center;color:var(--muted)}.decision-tip{display:grid;gap:3px;padding:10px 12px;border:1px solid #c9d5fb;border-radius:9px;background:var(--brand-soft);color:#2f438c;font-size:12px;line-height:1.55}.decision-tip.keep{border-color:#a9d7bf;background:var(--green-soft);color:#12623e}.decision-tip.remove{border-color:#efb7b1;background:var(--red-soft);color:#8f2017}.decision-tip.unsure{border-color:#d0c1f0;background:var(--purple-soft);color:#57349b}.quality-alert{margin:0 0 12px;padding:10px 12px;border:1px solid #efc478;border-radius:9px;background:var(--orange-soft);color:#6b3c00;font-size:12px}.quality-alert ul{margin:0;padding-left:18px}.form-status{min-height:24px;margin-top:10px;font-size:13px;color:var(--red)}.review-actions{display:grid;grid-template-columns:auto 1fr auto;gap:8px;padding:13px 20px;border-top:1px solid var(--line);background:#fff}.review-actions .primary{width:100%}
+    .progress-track{height:9px;background:#e8ecf4;border-radius:999px;overflow:hidden}.progress-bar{height:100%;width:0;background:var(--brand);transition:width .2s}.floating-progress{position:fixed;right:20px;bottom:20px;z-index:20;width:min(340px,calc(100vw - 24px));padding:15px;border:1px solid #b8c6f4;border-radius:15px;background:rgba(255,255,255,.97);box-shadow:0 18px 45px rgba(24,35,65,.2);backdrop-filter:blur(9px)}.floating-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.floating-head strong{font-size:15px}.floating-count{font-size:13px;color:var(--muted)}.floating-progress .actions{margin-top:11px}.error-count{color:var(--red)}
+    .export-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.check-list{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:7px}.check-list li{padding:8px 10px;border-radius:8px;background:var(--soft)}.check-list li.ok{color:var(--green);background:var(--green-soft)}.check-list li.warn{color:var(--orange);background:var(--orange-soft)}.quality-stats{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.quality-stats span{padding:5px 9px;border-radius:999px;background:var(--soft);color:var(--muted);font-size:12px}.quality-ack{display:flex;align-items:flex-start;gap:8px;margin-top:12px;padding:11px 12px;border:1px solid #efc478;border-radius:9px;background:var(--orange-soft);color:#6b3c00;font-size:13px}.quality-ack input{flex:0 0 auto;width:17px;height:17px;margin-top:2px}.review-pledge{display:grid;gap:10px;margin-top:14px}.review-pledge ul{margin:0;padding-left:20px;color:#475467}.pledge-check{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--soft)}.pledge-check input{flex:0 0 auto;width:18px;height:18px;margin-top:3px}.status-line{min-height:25px;margin-top:11px;color:var(--green)}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:26px}
+    @media(max-width:1280px){.review-layout{grid-template-columns:minmax(280px,34%) minmax(0,1fr)}.form-card{grid-column:2}.rule-card{grid-column:2}.directory{grid-row:1/3}.rule-card,.form-card,.directory{position:static;max-height:none}.directory{max-height:calc(100vh - 120px)}.review-actions{position:sticky;bottom:0}}
+    @media(max-width:760px){.shell{padding:16px 12px 190px}.hero{padding:21px;border-radius:17px}.quick-links,.tabs{display:grid}.hero-link,.tab{justify-content:center;width:100%}.summary-grid,.export-grid,.review-layout{grid-template-columns:1fr}.directory,.rule-card,.form-card{grid-column:auto;grid-row:auto;min-height:0}.directory{max-height:420px}.review-actions{grid-template-columns:1fr}.floating-progress{right:12px;bottom:12px}.section-head,.review-topline{flex-direction:column}.directory-tools{grid-template-columns:1fr}}
+    @media print{body{background:#fff}.shell{max-width:none;padding:0}.hero{background:#fff;color:#000;border:1px solid #aaa;box-shadow:none}.hero p,.hero-meta span{color:#333}.load-grid,.tabs,.actions,.review-actions,.floating-progress,button,input[type=file]{display:none!important}.tab-panel{display:block!important}.panel,.directory,.rule-card,.form-card{box-shadow:none;position:static;max-height:none;break-inside:avoid}}
+
+    /* v1.4：单页沉浸式工作台 */
+    html,body{height:100%}body{overflow:hidden}.immersive-shell{display:flex;flex-direction:column;width:100%;max-width:none;height:100vh;margin:0;padding:0;overflow:hidden}.app-bar{position:relative;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:20px;flex:0 0 auto;min-height:76px;padding:12px 20px;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 3px 14px rgba(24,35,65,.04)}.brand-block{display:flex;align-items:center;gap:18px;min-width:0}.app-title{font-size:20px;line-height:1.3;font-weight:750;white-space:nowrap}.app-version{display:block;margin-top:2px;color:var(--muted);font-size:11px;font-weight:500}.task-meta{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}.task-meta span{display:inline-flex;gap:5px;align-items:center;color:var(--muted);font-size:12px;white-space:nowrap}.task-meta span+span::before{content:'·';margin-right:3px;color:#a1a9b8}.task-meta strong{max-width:220px;overflow:hidden;text-overflow:ellipsis;color:var(--text);font-weight:650}.top-tools{display:flex;align-items:center;gap:8px;flex:0 0 auto}.tool-action{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:7px 11px;border:1px solid #c8d0df;border-radius:9px;background:#fff;color:var(--text);font-weight:600}.tool-action:hover{border-color:#8fa5ee;background:var(--brand-soft);color:#2948b4}.tool-action.primary{background:var(--brand);border-color:var(--brand);color:#fff}.tool-action::after{content:attr(data-tooltip);position:absolute;top:calc(100% + 9px);right:0;width:max-content;max-width:280px;padding:7px 9px;border-radius:7px;background:#172033;color:#fff;font-size:12px;font-weight:400;line-height:1.45;white-space:normal;opacity:0;visibility:hidden;transform:translateY(-3px);transition:.15s;pointer-events:none;box-shadow:0 8px 22px rgba(23,32,51,.2)}.tool-action:hover::after,.tool-action:focus-visible::after{opacity:1;visibility:visible;transform:translateY(0)}
+    .prompt-dock{display:grid;grid-template-columns:90px minmax(0,1fr) auto;align-items:start;gap:14px;flex:0 0 auto;max-height:none;margin:12px 20px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 3px 14px rgba(24,35,65,.03)}.prompt-label{padding-top:2px;font-size:14px;font-weight:700}.prompt-view-immersive{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;max-height:none;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;color:#344054;font-size:13px;line-height:1.65}.prompt-view-immersive.placeholder{color:var(--muted)}.prompt-dock.expanded .prompt-view-immersive{display:block;-webkit-line-clamp:unset;overflow:visible}.prompt-toggle{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:34px;padding:5px 9px;border:1px solid #c8d0df;border-radius:8px;background:#fff;color:#3157d5;white-space:nowrap;font-size:12px;font-weight:650}.prompt-toggle:hover:not(:disabled){background:var(--brand-soft);border-color:#9cb2ff}.prompt-toggle:disabled{opacity:.45;cursor:not-allowed}.prompt-toggle-icon{font-size:15px;line-height:1;transition:transform .18s}.prompt-dock.expanded .prompt-toggle-icon{transform:rotate(180deg)}
+    .empty-review{display:flex;align-items:center;justify-content:center;flex:1;min-height:0;margin:0 20px 20px;border:1px dashed #b8c2d4;border-radius:14px;background:rgba(255,255,255,.65)}.empty-review-card{max-width:520px;padding:30px;text-align:center}.empty-review-card h2{margin-bottom:8px}.empty-review-card p{margin-bottom:16px;color:var(--muted)}.immersive-shell .workspace{display:none;flex:1;min-height:0;overflow:hidden}.immersive-shell .workspace.ready{display:flex;flex-direction:column}.immersive-shell .review-section{display:flex;flex:1;min-height:0;flex-direction:column;padding:0 20px 18px}.immersive-shell .review-topline{flex:0 0 auto;margin:0 0 9px}.immersive-shell .review-topline h2{font-size:19px}.immersive-shell .review-layout{display:grid;grid-template-columns:minmax(290px,.78fr) minmax(340px,1fr) minmax(360px,1.05fr);flex:1;min-height:0;overflow:hidden}.immersive-shell .directory,.immersive-shell .rule-card,.immersive-shell .form-card{position:static;align-self:stretch;width:100%;height:100%;min-height:0;max-height:none}.immersive-shell .directory,.immersive-shell .rule-card{overflow-y:auto;overflow-x:hidden}.immersive-shell .form-card{overflow:hidden}.immersive-shell .floating-progress{bottom:82px;width:300px;padding:11px 13px}.immersive-shell .floating-progress .actions{margin-top:8px}
+    dialog.operation-dialog{width:min(680px,calc(100vw - 32px));max-height:min(82vh,760px);padding:0;overflow:hidden;border:0;border-radius:16px;background:#fff;color:var(--text);box-shadow:0 28px 80px rgba(23,32,51,.28)}dialog.operation-dialog.wide{width:min(900px,calc(100vw - 32px))}dialog.operation-dialog::backdrop{background:rgba(20,28,45,.46);backdrop-filter:blur(2px)}.dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:18px 20px 14px;border-bottom:1px solid var(--line)}.dialog-head h2{font-size:20px}.dialog-head p{margin-top:3px;color:var(--muted);font-size:13px}.dialog-close{flex:0 0 auto;width:36px;height:36px;min-height:36px;border:0;border-radius:9px;background:var(--soft);color:var(--muted);font-size:22px;line-height:1}.dialog-body{max-height:calc(82vh - 80px);padding:18px 20px;overflow:auto}.dialog-body .upload-box{padding:0}.dialog-status{min-height:24px;margin-top:12px;color:var(--green);font-size:13px}.dialog-status.error{color:var(--red)}.dialog-section+.dialog-section{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.dialog-section h3{margin-bottom:5px}.dialog-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .drawer-layer{position:fixed;inset:0;z-index:80;background:rgba(20,28,45,.36);opacity:0;transition:opacity .2s ease}.drawer-layer.open{opacity:1}.side-drawer{position:absolute;top:0;right:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;width:min(820px,92vw);height:100%;background:#fff;box-shadow:-22px 0 60px rgba(23,32,51,.2);transform:translateX(100%);transition:transform .24s ease}.drawer-layer.open .side-drawer{transform:translateX(0)}.drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 22px 16px;border-bottom:1px solid var(--line);background:#fff}.drawer-head h2{font-size:22px}.drawer-head p{margin-top:3px;color:var(--muted);font-size:13px}.drawer-close{flex:0 0 auto;width:38px;height:38px;min-height:38px;border:0;border-radius:9px;background:var(--soft);color:var(--muted);font-size:24px;line-height:1}.drawer-body{min-height:0;padding:18px 22px 28px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}.drawer-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:14px 22px;border-top:1px solid var(--line);background:#fff;box-shadow:0 -8px 24px rgba(24,35,65,.05)}body.drawer-open{overflow:hidden!important}.gap-choice-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.gap-choice{position:relative;display:block}.gap-choice input{position:absolute;opacity:0;pointer-events:none}.gap-choice span{display:block;height:100%;padding:13px 14px;border:1px solid var(--line);border-radius:11px;background:#fff}.gap-choice strong{display:block;margin-bottom:3px}.gap-choice small{display:block;color:var(--muted);line-height:1.5}.gap-choice input:checked+span{border-color:#7792ed;background:var(--brand-soft);box-shadow:0 0 0 2px rgba(49,87,213,.08)}.proposed-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 10px}.proposed-toolbar p{color:var(--muted);font-size:13px}.proposed-list{display:grid;gap:12px}.proposed-card{padding:15px;border:1px solid var(--line);border-radius:12px;background:var(--soft)}.proposed-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.proposed-card-head strong{font-size:15px}.proposed-grid{display:grid;grid-template-columns:1fr 160px;gap:12px}.proposed-card .field+.field{margin-top:12px}.proposed-grid .field+.field{margin-top:0}.inline-ack{display:flex;align-items:flex-start;gap:8px;margin-top:12px;padding:10px;border:1px solid #c9d5fb;border-radius:9px;background:#fff;color:#344054;font-size:13px}.inline-ack input{flex:0 0 auto;width:17px;height:17px;margin-top:3px}.addition-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}.addition-summary p{color:var(--muted);font-size:13px}.field-help{color:var(--muted);font-size:12px}.field-error{margin-top:8px;color:var(--red);font-size:12px}
+    @media(min-width:1281px){body.prompt-expanded{overflow:auto}body.prompt-expanded .immersive-shell{height:auto;min-height:100vh;overflow:visible}body.prompt-expanded .app-bar{position:sticky;top:0}body.prompt-expanded .workspace.ready{flex:none;min-height:720px;overflow:visible}body.prompt-expanded .review-section{min-height:720px}body.prompt-expanded .review-layout{min-height:640px;overflow:hidden}}
+    @media(max-width:1280px){body{overflow:auto}.immersive-shell{height:auto;min-height:100vh;overflow:visible}.app-bar{position:sticky;top:0}.immersive-shell .workspace.ready{overflow:visible}.immersive-shell .review-section{min-height:900px}.immersive-shell .review-layout{grid-template-columns:minmax(280px,34%) minmax(0,1fr);overflow:visible}.immersive-shell .directory{grid-row:1/3;max-height:none}.immersive-shell .rule-card,.immersive-shell .form-card{grid-column:2}.immersive-shell .directory,.immersive-shell .rule-card,.immersive-shell .form-card{height:auto;min-height:420px}.immersive-shell .floating-progress{position:fixed}}
+    @media(max-width:760px){.app-bar{align-items:flex-start;padding:11px 12px}.brand-block{display:grid;gap:5px}.app-title{font-size:17px}.task-meta span+span::before{display:none}.top-tools{gap:5px}.tool-action{width:38px;padding:7px;font-size:0}.tool-action .tool-icon{font-size:16px}.prompt-dock{grid-template-columns:minmax(0,1fr) auto;gap:5px 9px;margin:9px 12px}.prompt-label{grid-column:1}.prompt-toggle{grid-column:2}.prompt-view-immersive{grid-column:1/-1;grid-row:2}.empty-review{margin:0 12px 120px}.immersive-shell .review-section{min-height:0;padding:0 12px 190px}.immersive-shell .review-layout{grid-template-columns:1fr}.immersive-shell .directory,.immersive-shell .rule-card,.immersive-shell .form-card{grid-column:auto;grid-row:auto;min-height:0}.immersive-shell .directory{max-height:420px}.immersive-shell .rule-card{min-height:420px}.immersive-shell .form-card{min-height:520px}.immersive-shell .floating-progress{bottom:12px;width:min(340px,calc(100vw - 24px))}.dialog-actions{display:grid}.dialog-actions>*{width:100%;justify-content:center}.side-drawer{width:100vw}.drawer-head,.drawer-body,.drawer-footer{padding-left:15px;padding-right:15px}.drawer-footer{display:grid;grid-template-columns:1fr 1fr}.gap-choice-list,.proposed-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main class="shell immersive-shell">
+  <header class="app-bar">
+    <div class="brand-block">
+      <div class="app-title">Rubric 专家校准<span class="app-version">本地工作台 · v1.5.0</span></div>
+      <div class="task-meta" id="taskSummary"><span>任务 ID <strong>未导入</strong></span><span>项目 ID <strong>—</strong></span><span>Rubric <strong>—</strong></span></div>
+    </div>
+    <div class="top-tools" aria-label="任务操作">
+      <button class="tool-action" id="importAction" type="button" data-tooltip="导入从任务查询页面下载的评审包"><span class="tool-icon">＋</span><span>导入任务包</span></button>
+      <button class="tool-action" id="recoverAction" type="button" data-tooltip="导入之前导出的反馈 JSON，或清空当前任务草稿"><span class="tool-icon">↺</span><span>恢复进度</span></button>
+      <button class="tool-action" id="addRubricAction" type="button" data-tooltip="补充现有规则没有覆盖、且可以稳定验证的新判据"><span class="tool-icon">✚</span><span>补充 Rubric</span></button>
+      <button class="tool-action primary" id="exportAction" type="button" data-tooltip="检查完成情况并导出反馈文件"><span class="tool-icon">⇧</span><span>导出反馈</span></button>
+    </div>
+  </header>
+
+  <section class="prompt-dock" id="promptDock" aria-label="原始题目">
+    <div class="prompt-label">原始题目</div>
+    <div class="prompt-view-immersive placeholder" id="promptView">导入任务评审包后，这里会显示原始题目。</div>
+    <button class="prompt-toggle" id="promptToggle" type="button" aria-expanded="false" aria-controls="promptView" disabled><span id="promptToggleText">展开题目</span><span class="prompt-toggle-icon">⌄</span></button>
+  </section>
+
+  <section class="empty-review" id="emptyWorkspace">
+    <div class="empty-review-card"><h2>开始审核</h2><p>先导入任务评审包。导入后会直接进入逐条审核，不需要切换步骤。</p><button class="btn primary" id="emptyImportAction" type="button">导入任务评审包</button></div>
+  </section>
+
+  <div class="workspace" id="workspace">
+    <section class="review-section" id="panel-review">
+      <div class="review-topline"><div><h2>逐条审核</h2><p class="small">绿色表示已完成，红色表示已经选择结论但必填内容不完整。</p></div><div class="small" id="currentPosition">第 1 / 1 条</div></div>
+      <div class="review-layout">
+        <aside class="directory" aria-label="规则目录">
+          <div class="section-head"><div><h3>规则目录</h3><p class="small">按评分维度分组</p></div><strong id="directoryProgress">0 / 0</strong></div>
+          <div class="directory-tools"><input id="directorySearch" type="search" placeholder="搜索规则"><select id="directoryStatus"><option value="">全部状态</option><option value="unanswered">未标注</option><option value="invalid">待补充</option><option value="complete">已完成</option></select></div>
+          <div id="ruleDirectory"></div>
+        </aside>
+
+        <article class="rule-card" id="currentRuleCard">
+          <div class="rule-index" id="ruleIndex"></div>
+          <div class="rule-title" id="ruleMeta"></div>
+          <div class="rule-copy" id="ruleText"></div>
+          <div class="plain-copy" id="plainText" hidden></div>
+          <div class="guidance">
+            <h3>判定说明</h3>
+            <ul>
+              <li>保留：符合题意、范围合适，而且可以稳定验证。</li>
+              <li>修改：方向合理，但表述、范围、技术细节、权重或可验证性需要调整。</li>
+              <li>建议删除：规则重复、超出题意、技术错误或无法稳定验证。</li>
+              <li>不确定：现有题目、平台轨迹或上下文不足以支持判断。</li>
+            </ul>
+          </div>
+        </article>
+
+        <section class="form-card" aria-label="当前规则标注表单">
+          <div class="form-scroll">
+            <h3>当前规则的结论</h3>
+            <div class="decision-row" id="decisionRow"></div>
+            <div class="quality-alert" id="qualityAlert" hidden></div>
+            <div class="dynamic-fields" id="dynamicFields"></div>
+            <div class="form-status" id="formStatus" aria-live="polite"></div>
+          </div>
+          <div class="review-actions">
+            <button class="btn" id="previousRule" type="button">上一条</button>
+            <button class="btn primary" id="saveAndNext" type="button">保存并下一条</button>
+            <button class="btn" id="nextIncomplete" type="button">下一条未标注</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <aside class="floating-progress" id="floatingProgress" hidden aria-live="polite">
+    <div class="floating-head"><strong>审核进度</strong><span class="floating-count" id="rubricProgressText">0 / 0</span></div>
+    <div class="progress-track" id="rubricTrack" role="progressbar"><div class="progress-bar" id="rubricProgress"></div></div>
+    <div class="floating-count" id="remainingText" style="margin-top:8px">尚未导入任务包</div>
+    <div class="floating-count error-count" id="errorText"></div>
+    <div class="actions"><button class="btn" id="floatingNextIncomplete" type="button">下一条未标注</button><button class="btn primary" id="jumpExport" type="button">导出</button></div>
+  </aside>
+</main>
+
+<dialog class="operation-dialog" id="reviewBriefDialog">
+  <div class="dialog-head"><div><h2>开始前请确认</h2><p>本次不是确认 AI 写得像不像，而是判断每条 Rubric 能否直接、公平、稳定地用于验收这道题。</p></div></div>
+  <div class="dialog-body">
+    <div class="notice" style="margin-top:0"><strong>不要默认保留，也不要为了调整比例而修改或删除。</strong>每条结论都需要由题目、平台任务轨迹或实际交付结果支持。</div>
+    <div class="review-pledge">
+      <ul><li>保留表示原文无需修改就能直接用于评分，不只是方向大致正确。</li><li>判断依据要写明对应的题目要求和可以复核的事实。</li><li>不能只写“合理”“同意”“符合要求”或“没问题”。</li></ul>
+      <label class="pledge-check"><input class="brief-check" type="checkbox"><span>我已阅读完整原始题目。</span></label>
+      <label class="pledge-check"><input class="brief-check" type="checkbox"><span>我已通过平台任务链接查看任务轨迹、最终结果和当时的反馈。</span></label>
+      <label class="pledge-check"><input class="brief-check" type="checkbox"><span>我会逐条独立判断，并为每个结论填写可以复核的依据。</span></label>
+      <button class="btn primary" id="acceptBrief" type="button" disabled>开始逐条审核</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="operation-dialog" id="importDialog">
+  <div class="dialog-head"><div><h2>导入任务评审包</h2><p>导入后直接进入逐条审核，页面会自动恢复本机草稿。</p></div><button class="dialog-close" type="button" data-close-dialog aria-label="关闭">×</button></div>
+  <div class="dialog-body"><div class="upload-box"><p class="small">请选择发放给你的 <code>rubric_review_case</code> ZIP 任务评审包。</p><input id="caseFile" type="file" accept=".zip,application/zip"><div class="package-state" id="caseState"><span class="status-dot"></span>尚未导入任务包</div></div></div>
+</dialog>
+
+<dialog class="operation-dialog" id="recoverDialog">
+  <div class="dialog-head"><div><h2>恢复进度</h2><p>导入其他设备导出的反馈 JSON，或清空当前任务的本地草稿。</p></div><button class="dialog-close" type="button" data-close-dialog aria-label="关闭">×</button></div>
+  <div class="dialog-body"><div class="dialog-section"><h3>从文件恢复</h3><p class="small">任务 ID 不一致时会拒绝导入。</p><div class="dialog-actions"><input id="feedbackFile" type="file" accept=".json,application/json"></div></div><div class="dialog-section"><h3>重新开始</h3><p class="small">只清除当前任务保存在此浏览器中的标注内容。</p><div class="dialog-actions"><button class="btn danger" id="resetFeedback" type="button">清空当前任务反馈</button></div></div><div class="dialog-status" id="recoveryStatus" aria-live="polite"></div></div>
+</dialog>
+
+<div class="drawer-layer" id="newRubricDrawer" aria-hidden="true" hidden>
+  <aside class="side-drawer" aria-label="补充遗漏的 Rubric">
+    <div class="drawer-head"><div><h2>补充遗漏的 Rubric</h2><p>先完成现有规则的逐条审核，再判断是否仍有题目要求没有被覆盖。最多新增 3 条。</p></div><button class="drawer-close" type="button" data-close-drawer aria-label="关闭">×</button></div>
+    <div class="drawer-body">
+    <div class="notice" style="margin-top:0"><strong>只补充缺失的验收标准。</strong>如果只是原规则表述不好，请回到原规则选择修改；不要把同一要求拆成多条，也不要增加题目没有要求的内容。</div>
+    <div class="gap-choice-list" id="gapChoiceList">
+      <label class="gap-choice"><input type="radio" name="rubric-gap-status" value="complete"><span><strong>现有 Rubric 已覆盖完整</strong><small>没有必要新增，请简要说明你重点检查过哪些要求。</small></span></label>
+      <label class="gap-choice"><input type="radio" name="rubric-gap-status" value="has_gap"><span><strong>发现遗漏，需要新增</strong><small>新增项要能对应原始题目，并且可以由评分人稳定验证。</small></span></label>
+    </div>
+    <div id="noAdditionPanel" class="dialog-section" hidden>
+      <div class="field"><label for="noNewRubricReason">无需新增的判断依据<span class="required"> *</span></label><textarea id="noNewRubricReason" rows="3" placeholder="例如：已对照题目的交付物、内容范围和验证要求检查，现有规则均有对应覆盖。"></textarea><div class="field-help">不要只写“没有”“已覆盖”或“无需新增”。</div></div>
+    </div>
+    <div id="proposedPanel" class="dialog-section" hidden>
+      <div class="proposed-toolbar"><div><h3>新增 Rubric</h3><p>每条都需要写清遗漏原因、题目依据和验证方法。</p></div><button class="btn primary" id="addProposedRubric" type="button">＋ 新增一条</button></div>
+      <div class="proposed-list" id="proposedRubricList"></div>
+    </div>
+    <div class="dialog-status" id="proposedStatus" aria-live="polite"></div>
+    </div>
+    <div class="drawer-footer"><button class="btn" type="button" data-close-drawer>稍后再填</button><button class="btn primary" id="finishProposedRubrics" type="button">保存并继续导出</button></div>
+  </aside>
+</div>
+
+<dialog class="operation-dialog" id="exportDialog">
+  <div class="dialog-head"><div><h2>导出反馈</h2><p>正式 JSON 需要全部规则完成；草稿和摘要可以随时导出。</p></div><button class="dialog-close" type="button" data-close-dialog aria-label="关闭">×</button></div>
+  <div class="dialog-body"><div class="dialog-section"><h3>提交前检查</h3><div class="quality-stats" id="qualityStats"></div><ul class="check-list" id="validationList"></ul><div class="addition-summary"><div><strong id="additionSummaryTitle">尚未检查遗漏规则</strong><p id="additionSummaryText">请确认是否需要新增 Rubric。</p></div><button class="btn" id="editProposedRubrics" type="button">检查 / 编辑</button></div><label class="quality-ack" id="qualityAckWrap" hidden><input id="qualityAck" type="checkbox"><span>我已重新检查全部判据，确认每条原文都无需修改，并且不存在重复、无关、不可验证或不必要限制实现方式的问题。</span></label></div><div class="dialog-actions"><button class="btn primary" id="exportJson" type="button">导出正式反馈 JSON</button><button class="btn" id="exportDraftJson" type="button">导出草稿 JSON</button><button class="btn" id="exportMarkdown" type="button">导出 Markdown 摘要</button><button class="btn" id="exportCsv" type="button">导出 CSV</button><a class="btn" href="https://bytedance.larkoffice.com/share/base/form/shrcneTsEqlJeEfrZwS2fIHpEnc" target="_blank" rel="noopener">打开提交表单</a></div><div class="dialog-status" id="exportStatus" aria-live="polite"></div></div>
+</dialog>
+
+<script>
+'use strict';
+const APP_VERSION='1.5.0';
+const MAX_PROPOSED_RUBRICS=3;
+const LIMITS={zipBytes:300*1024*1024,entries:10000,entryBytes:100*1024*1024,totalBytes:600*1024*1024,textBytes:6*1024*1024};
+const decisions={keep:'保留',revise:'修改',remove:'建议删除',unsure:'不确定'};
+const reasonCodes={
+  wording_issue:'表述不清或容易误解',scope_issue:'范围需要调整',implementation_lock:'不必要地限制实现方案',technical_error:'技术描述不准确',unverifiable:'无法稳定验证',weight_issue:'权重或层级不合理',other_revise:'其他修改原因',
+  duplicate:'与其他规则重复',beyond_scope:'超出题目范围',not_necessary:'不是必要评分项',other_remove:'其他删除原因',
+  insufficient_context:'现有信息不足',missing_trace:'平台轨迹信息不足',missing_source:'缺少必要源码或数据',unclear_requirement:'题目要求存在歧义',needs_owner:'需要题目负责人确认',other_unsure:'其他无法判断原因',
+  keep_valid:'符合题意且可稳定验证'
+};
+const decisionReasonOptions={
+  revise:['wording_issue','scope_issue','implementation_lock','technical_error','unverifiable','weight_issue','other_revise'],
+  remove:['duplicate','beyond_scope','technical_error','unverifiable','not_necessary','other_remove'],
+  unsure:['insufficient_context','missing_trace','missing_source','unclear_requirement','needs_owner','other_unsure']
+};
+const decisionTips={
+  keep:{title:'保留表示原文可以直接用于评分',text:'请写明它对应题目的哪项要求，以及评分人可以通过什么结果验证。仅写“合理”“同意”或“符合要求”不能完成本条。'},
+  revise:{title:'修改表示检查方向合理，但原文还不能直接使用',text:'请指出原判据的问题，并给出可以直接替换原文的完整新表述。'},
+  remove:{title:'建议删除需要指出具体问题',text:'请说明它是无关、重复、错误、无法验证，还是不必要地限制了实现方式。'},
+  unsure:{title:'不确定只用于现有信息确实不足',text:'请写清还需要什么信息，以及为什么缺少这些信息就无法判断。'}
+};
+const $=id=>document.getElementById(id);
+let caseData=null,state=null,currentRubricId='';
+
+function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function nonEmpty(v){return typeof v==='string'&&v.trim().length>0;}
+function humanBytes(n){if(!Number.isFinite(Number(n)))return'未知';n=Number(n);const u=['B','KB','MB','GB'];let i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return`${n.toFixed(i?1:0)} ${u[i]}`;}
+function normalizePath(path){const p=String(path||'').replaceAll('\\','/');if(!p||p.includes('\0')||p.startsWith('/')||/^[A-Za-z]:\//.test(p))throw new Error(`不安全的 ZIP 路径：${p||'(空)'}`);const parts=p.split('/');if(parts.some(x=>x==='..'))throw new Error(`ZIP 包含越界路径：${p}`);return parts.filter(x=>x&&x!=='.').join('/');}
+function hex(buffer){return[...new Uint8Array(buffer)].map(b=>b.toString(16).padStart(2,'0')).join('');}
+function assert(condition,message){if(!condition)throw new Error(message);}
+function asArray(value,key){if(Array.isArray(value))return value;if(value&&Array.isArray(value[key]))return value[key];return[];}
+
+class SafeZip{
+  constructor(file,buffer,entries,hash){this.file=file;this.buffer=buffer;this.entries=entries;this.hash=hash;}
+  static async open(file){
+    if(!file||file.size>LIMITS.zipBytes)throw new Error(`ZIP 文件不能超过 ${humanBytes(LIMITS.zipBytes)}`);
+    const buffer=await file.arrayBuffer(),bytes=new Uint8Array(buffer),view=new DataView(buffer);let eocd=-1;
+    for(let i=Math.max(0,bytes.length-65557);i<=bytes.length-22;i++){if(view.getUint32(i,true)===0x06054b50)eocd=i;}
+    if(eocd<0)throw new Error('未找到 ZIP 中央目录，文件可能损坏或不是 ZIP。');
+    const count=view.getUint16(eocd+10,true),centralSize=view.getUint32(eocd+12,true),centralOffset=view.getUint32(eocd+16,true);
+    if(count===0xffff||centralOffset===0xffffffff||centralSize===0xffffffff)throw new Error('暂不支持 ZIP64，请拆分压缩包。');
+    if(count>LIMITS.entries)throw new Error(`ZIP 文件数超过限制：${count} > ${LIMITS.entries}`);if(centralOffset+centralSize>bytes.length)throw new Error('ZIP 中央目录越界。');
+    const decoder=new TextDecoder('utf-8'),entries=new Map();let pos=centralOffset,total=0;
+    for(let i=0;i<count;i++){
+      if(view.getUint32(pos,true)!==0x02014b50)throw new Error(`ZIP 中央目录第 ${i+1} 项损坏。`);
+      const flags=view.getUint16(pos+8,true),method=view.getUint16(pos+10,true),compressed=view.getUint32(pos+20,true),size=view.getUint32(pos+24,true),nameLen=view.getUint16(pos+28,true),extraLen=view.getUint16(pos+30,true),commentLen=view.getUint16(pos+32,true),localOffset=view.getUint32(pos+42,true);
+      const rawName=decoder.decode(bytes.slice(pos+46,pos+46+nameLen)),name=normalizePath(rawName);if(flags&1)throw new Error(`不支持加密 ZIP 条目：${name}`);if(![0,8].includes(method))throw new Error(`不支持的 ZIP 压缩方式 ${method}：${name}`);
+      if(size>LIMITS.entryBytes)throw new Error(`单文件解压后过大：${name}`);total+=size;if(total>LIMITS.totalBytes)throw new Error(`ZIP 解压总量超过 ${humanBytes(LIMITS.totalBytes)}`);
+      if(name&&!rawName.endsWith('/')){if(entries.has(name))throw new Error(`ZIP 内存在重复路径：${name}`);entries.set(name,{name,method,compressed,size,localOffset});}pos+=46+nameLen+extraLen+commentLen;
+    }
+    const hash=hex(await crypto.subtle.digest('SHA-256',buffer));return new SafeZip(file,buffer,entries,hash);
+  }
+  has(path){return this.entries.has(normalizePath(path));}
+  entry(path){const p=normalizePath(path),e=this.entries.get(p);if(!e)throw new Error(`ZIP 缺少文件：${p}`);return e;}
+  async bytesFor(path){
+    const e=this.entry(path),view=new DataView(this.buffer);if(view.getUint32(e.localOffset,true)!==0x04034b50)throw new Error(`ZIP 本地文件头损坏：${e.name}`);
+    const nameLen=view.getUint16(e.localOffset+26,true),extraLen=view.getUint16(e.localOffset+28,true),start=e.localOffset+30+nameLen+extraLen,end=start+e.compressed;if(end>this.buffer.byteLength)throw new Error(`ZIP 数据越界：${e.name}`);
+    const slice=this.buffer.slice(start,end);if(e.method===0)return new Uint8Array(slice);if(typeof DecompressionStream==='undefined')throw new Error('当前浏览器不支持 ZIP 解压，请使用最新版 Chrome、Edge 或 Safari。');
+    const stream=new Blob([slice]).stream().pipeThrough(new DecompressionStream('deflate-raw'));const out=new Uint8Array(await new Response(stream).arrayBuffer());if(out.byteLength!==e.size)throw new Error(`ZIP 解压大小不一致：${e.name}`);return out;
+  }
+  async text(path){const e=this.entry(path);if(e.size>LIMITS.textBytes)throw new Error(`文本超过 ${humanBytes(LIMITS.textBytes)}：${e.name}`);return new TextDecoder('utf-8',{fatal:false}).decode(await this.bytesFor(path));}
+  async json(path){const text=await this.text(path);try{return JSON.parse(text)}catch(err){throw new Error(`JSON 格式错误：${path}；${err.message}`)}}
+}
+class ZipView{
+  constructor(zip,prefix=''){this.zip=zip;this.prefix=prefix?normalizePath(prefix)+'/':'';this.hash=zip.hash;}
+  path(p){return this.prefix+normalizePath(p)}has(p){return this.zip.has(this.path(p))}entry(p){return this.zip.entry(this.path(p))}text(p){return this.zip.text(this.path(p))}json(p){return this.zip.json(this.path(p))}
+}
+async function verifyManifestFiles(view,manifest){
+  if(!Array.isArray(manifest.files))return 0;if(manifest.files.length>2000)throw new Error('manifest.files 数量超过 2000。');let verified=0;
+  for(const file of manifest.files){assert(file.path,'manifest.files 中存在缺少 path 的记录。');const entry=view.entry(file.path);if(Number.isFinite(Number(file.size)))assert(entry.size===Number(file.size),`文件大小不一致：${file.path}`);if(file.sha256){const actual=hex(await crypto.subtle.digest('SHA-256',await view.zip.bytesFor(view.path(file.path))));assert(actual===String(file.sha256).toLowerCase(),`文件哈希不一致：${file.path}`);verified++;}}
+  return verified;
+}
+
+function emptyDraft(){return{reason_code:'',note:'',rewrite:'',needed_info:''};}
+function normalizeFeedback(raw={}){
+  const f=raw&&typeof raw==='object'?raw:{};f.decision=f.decision||'';f.drafts=f.drafts&&typeof f.drafts==='object'?f.drafts:{};
+  if(f.decision&&!f.drafts[f.decision])f.drafts[f.decision]={reason_code:f.reason_code||'',note:f.note||'',rewrite:f.rewrite||'',needed_info:f.needed_info||''};
+  for(const d of Object.keys(decisions))f.drafts[d]=Object.assign(emptyDraft(),f.drafts[d]||{});return f;
+}
+function currentDraft(f){f=normalizeFeedback(f);return f.drafts[f.decision]||emptyDraft();}
+function validReason(decision,code){return(decisionReasonOptions[decision]||[]).includes(code);}
+function normalizedNote(v){return String(v||'').toLowerCase().replace(/[\s，。！？、,.!?:：；;"“”'‘’（）()【】\[\]]+/g,'');}
+function textLength(v){return Array.from(String(v||'').trim()).length;}
+function noteIssue(v){
+  const text=String(v||'').trim(),normalized=normalizedNote(text);if(!text)return'请填写判断依据。';
+  if(textLength(text)<12)return'判断依据至少需要写清题目要求或可以复核的事实，不能只给结论。';
+  if(/^(合理|同意|符合要求|符合题意|没问题|无问题|可以|可以保留|保留|通过|ok|good|pass)$/.test(normalized))return'不能只写“合理”“同意”“符合要求”或“没问题”，请补充具体依据。';
+  return'';
+}
+function feedbackIssue(raw){
+  const f=normalizeFeedback(raw),d=currentDraft(f);if(!f.decision)return'请先选择当前规则的结论。';
+  if(['revise','remove','unsure'].includes(f.decision)&&!validReason(f.decision,d.reason_code))return'请选择与当前结论对应的原因分类。';
+  const noteProblem=noteIssue(d.note);if(noteProblem)return noteProblem;
+  if(f.decision==='revise'&&textLength(d.rewrite)<12)return'请填写可以直接替换原判据的完整新表述。';
+  if(f.decision==='unsure'&&textLength(d.needed_info)<6)return'请写清还需要什么信息才能做出判断。';
+  return'';
+}
+function feedbackComplete(raw){return feedbackIssue(raw)==='';}
+function feedbackStatus(raw){const f=normalizeFeedback(raw);return feedbackComplete(f)?'complete':(f.decision?'invalid':'unanswered');}
+function emptyProposedRubric(id=''){return{id,dimension:'',statement:'',gap_reason:'',prompt_requirement:'',verification_method:'',weight:'1',weight_reason:'',non_duplicate_ack:false};}
+function normalizeProposedRubric(raw={},index=0){const p=raw&&typeof raw==='object'?raw:{};return Object.assign(emptyProposedRubric(`proposed-${String(index+1).padStart(2,'0')}`),p,{non_duplicate_ack:p.non_duplicate_ack===true,weight:String(p.weight||'1')});}
+function proposedRubricIssue(raw,index=0){const p=normalizeProposedRubric(raw,index);if(!p.dimension)return'请选择评分维度。';if(textLength(p.statement)<12)return'完整判据至少需要 12 个字。';if(textLength(p.gap_reason)<10)return'请具体说明现有规则漏掉了什么。';if(textLength(p.prompt_requirement)<8)return'请写清它对应原始题目的哪项要求。';if(textLength(p.verification_method)<10)return'请写清评分人如何通过交付结果验证。';if(!['1','2','3','4','5'].includes(String(p.weight)))return'建议权重需要在 1–5 之间。';if(textLength(p.weight_reason)<6)return'请说明为什么建议使用这个权重。';if(!p.non_duplicate_ack)return'请确认它与现有规则不重复。';return'';}
+function additionIssue(){if(!state)return'请先导入任务包。';if(!['complete','has_gap'].includes(state.rubric_gap_status))return'请确认现有 Rubric 是否存在遗漏。';if(state.rubric_gap_status==='complete'){const reason=String(state.no_new_rubric_reason||'').trim();if(textLength(reason)<12||/^(没有|已覆盖|无需新增|无|完整)$/.test(normalizedNote(reason)))return'请具体说明你检查过哪些题目要求，以及为什么无需新增。';return'';}if(!state.proposed_rubrics.length)return'请至少新增 1 条 Rubric，或改选现有 Rubric 已覆盖完整。';if(state.proposed_rubrics.length>MAX_PROPOSED_RUBRICS)return`每个任务最多新增 ${MAX_PROPOSED_RUBRICS} 条 Rubric。`;for(let i=0;i<state.proposed_rubrics.length;i++){const issue=proposedRubricIssue(state.proposed_rubrics[i],i);if(issue)return`新增 Rubric ${i+1}：${issue}`;}return'';}
+function defaultState(){return{rubrics:{},review_brief_accepted:false,rubric_gap_status:'',no_new_rubric_reason:'',proposed_rubrics:[],updatedAt:''};}
+function storageKey(){return caseData?`rubric-review:${caseData.metadata.task_id}:${caseData.metadata.prompt_sha256||caseData.packageHash}:v1`:'';}
+function loadLocalState(){const raw=localStorage.getItem(storageKey());try{state=raw?Object.assign(defaultState(),JSON.parse(raw)):defaultState()}catch{state=defaultState()}if(!state.rubrics||typeof state.rubrics!=='object')state.rubrics={};state.review_brief_accepted=state.review_brief_accepted===true;state.rubric_gap_status=['complete','has_gap'].includes(state.rubric_gap_status)?state.rubric_gap_status:'';state.no_new_rubric_reason=String(state.no_new_rubric_reason||'');state.proposed_rubrics=Array.isArray(state.proposed_rubrics)?state.proposed_rubrics.slice(0,MAX_PROPOSED_RUBRICS).map(normalizeProposedRubric):[];for(const id of Object.keys(state.rubrics))state.rubrics[id]=normalizeFeedback(state.rubrics[id]);}
+function saveState(){if(!caseData)return;state.updatedAt=new Date().toISOString();localStorage.setItem(storageKey(),JSON.stringify(state));updateProgress();renderValidation();renderDirectory();}
+
+async function loadCaseView(view,packageName,packageHash){
+  const manifest=await view.json('manifest.json');assert(manifest.bundle_type==='rubric_review_case','任务包 manifest.bundle_type 必须是 rubric_review_case。');const verifiedFiles=await verifyManifestFiles(view,manifest);
+  const metadata=await view.json('task/metadata.json'),prompt=await view.text('task/prompt.md'),rubricDoc=await view.json('rubrics/rubrics.json');const rubrics=asArray(rubricDoc,'rubrics'),dimensions=Array.isArray(rubricDoc.dimensions)?rubricDoc.dimensions:[];
+  assert(metadata.task_id,'task/metadata.json 缺少 task_id。');assert(rubrics.length>0,'rubrics/rubrics.json 中没有 rubric。');const ids=new Set();for(const r of rubrics){assert(r.id,`存在缺少 id 的 rubric。`);assert(!ids.has(r.id),`rubric ID 重复：${r.id}`);ids.add(r.id);}if(manifest.task_id)assert(manifest.task_id===metadata.task_id,'manifest 与 metadata 的 task_id 不一致。');
+  caseData={view,manifest,metadata,prompt,rubrics,dimensions,packageName,packageHash,verifiedFiles};loadLocalState();currentRubricId=(rubrics.find(r=>!feedbackComplete(state.rubrics[r.id]))||rubrics[0]).id;renderAll();setPackageState(`已加载 ${metadata.task_id} · ${rubrics.length} 条 rubric · 校验 ${verifiedFiles} 个文件 · ${packageName}`,'ok');syncOperationAvailability();if($('importDialog').open)$('importDialog').close();if(!state.review_brief_accepted)openDialog('reviewBriefDialog');
+}
+async function handleCaseFile(file){
+  try{setPackageState('正在读取和校验任务包…','');const zip=await SafeZip.open(file),root=new ZipView(zip),manifest=await root.json('manifest.json');if(manifest.bundle_type==='rubric_review_case')await loadCaseView(root,file.name,zip.hash);else if(manifest.bundle_type==='rubric_review_pack')await loadCaseView(new ZipView(zip,manifest.case_prefix||'case'),file.name,zip.hash);else throw new Error(`不支持的任务包类型：${manifest.bundle_type||'(缺失)'}`);}catch(err){console.error(err);setPackageState(err.message,'error');}
+}
+function setPackageState(text,status){const el=$('caseState');el.className=`package-state ${status||''}`;el.innerHTML=`<span class="status-dot ${status||''}"></span>${esc(text)}`;}
+
+function setPromptExpanded(expanded){const on=!!caseData&&!!expanded;$('promptDock').classList.toggle('expanded',on);document.body.classList.toggle('prompt-expanded',on);$('promptToggle').disabled=!caseData;$('promptToggle').setAttribute('aria-expanded',String(on));$('promptToggleText').textContent=on?'收起题目':'展开题目';}
+function renderContext(){const m=caseData.metadata;$('taskSummary').innerHTML=`<span>任务 ID <strong title="${esc(m.task_id)}">${esc(m.task_id||'未提供')}</strong></span><span>项目 ID <strong title="${esc(m.project_id)}">${esc(m.project_id||'未提供')}</strong></span><span>Rubric <strong>${caseData.rubrics.length} 条</strong></span>`;$('promptView').textContent=caseData.prompt;$('promptView').classList.remove('placeholder');setPromptExpanded(false);}
+function dimensionInfo(id){return caseData.dimensions.find(d=>d.id===id)||{id,title:caseData.rubrics.find(r=>r.dimension===id)?.dimension_title||id,description:''};}
+function groupedRubrics(){const order=caseData.dimensions.map(d=>d.id),extras=[...new Set(caseData.rubrics.map(r=>r.dimension).filter(x=>!order.includes(x)))];return[...order,...extras].map(id=>({info:dimensionInfo(id),items:caseData.rubrics.filter(r=>r.dimension===id)})).filter(g=>g.items.length);}
+function renderDirectory(ensureCurrentVisible=false){
+  if(!caseData)return;const shouldFollow=ensureCurrentVisible===true,q=$('directorySearch').value.trim().toLowerCase(),statusFilter=$('directoryStatus').value;const completed=caseData.rubrics.filter(r=>feedbackComplete(state.rubrics[r.id])).length;$('directoryProgress').textContent=`${completed} / ${caseData.rubrics.length}`;
+  $('ruleDirectory').innerHTML=groupedRubrics().map(group=>{const done=group.items.filter(r=>feedbackComplete(state.rubrics[r.id])).length;const visible=group.items.filter(r=>{const st=feedbackStatus(state.rubrics[r.id]),text=`${r.id} ${r.original_text||r.description||''} ${r.plain_text||''}`.toLowerCase();return(!q||text.includes(q))&&(!statusFilter||st===statusFilter);});if(!visible.length)return'';return`<section class="dimension-group"><div class="dimension-head"><strong title="${esc(group.info.title)}">${esc(group.info.title)}</strong><span class="dimension-count">${done} / ${group.items.length}</span></div><div class="rule-directory-list">${visible.map(r=>{const st=feedbackStatus(state.rubrics[r.id]),label=st==='complete'?'完成':st==='invalid'?'待补':'未标',copy=r.original_text||r.description||'';return`<button class="directory-item ${st} ${r.id===currentRubricId?'current':''}" type="button" data-rule-id="${esc(r.id)}" title="${esc(copy)}"><span class="status"></span><span class="item-copy"><span class="item-id">${esc(r.id)}</span><span class="item-text">${esc(copy)}</span></span><span class="item-state">${label}</span></button>`;}).join('')}</div></section>`;}).join('')||'<div class="small">没有符合筛选条件的规则。</div>';
+  $('ruleDirectory').querySelectorAll('[data-rule-id]').forEach(b=>b.addEventListener('click',()=>setCurrentRule(b.dataset.ruleId)));if(shouldFollow)requestAnimationFrame(()=>$('ruleDirectory').querySelector('.directory-item.current')?.scrollIntoView({block:'nearest',inline:'nearest'}));
+}
+function currentRubric(){return caseData.rubrics.find(r=>r.id===currentRubricId)||caseData.rubrics[0];}
+function renderCurrentRule(){
+  const r=currentRubric(),index=caseData.rubrics.findIndex(x=>x.id===r.id);$('currentPosition').textContent=`第 ${index+1} / ${caseData.rubrics.length} 条`;$('ruleIndex').textContent=`第 ${index+1} 条 · ${r.id}`;$('ruleMeta').innerHTML=`<span class="badge">${esc(r.dimension_title||r.dimension)}</span><span class="badge ${r.tier==='必须完成'?'must':'key'}">${esc(r.tier||'未标注')}</span><span class="badge">权重 ${esc(r.weight)}</span>`;$('ruleText').textContent=r.original_text||r.description||'';$('plainText').hidden=!r.plain_text;$('plainText').textContent=r.plain_text?`普通语言：${r.plain_text}`:'';
+}
+function decisionChoices(selected){return Object.entries(decisions).map(([value,label])=>`<label class="choice" data-value="${value}"><input type="radio" name="current-decision" value="${value}" ${selected===value?'checked':''}><span>${label}</span></label>`).join('');}
+function reasonSelect(decision,selected,label){const options=decisionReasonOptions[decision]||[];return`<div class="field"><label>${label}<span class="required"> *</span></label><select data-field="reason_code"><option value="">请选择</option>${options.map(code=>`<option value="${code}" ${selected===code?'selected':''}>${esc(reasonCodes[code])}</option>`).join('')}</select></div>`;}
+function textareaField(field,label,value,placeholder,rows=4){return`<div class="field"><label>${label}<span class="required"> *</span></label><textarea data-field="${field}" rows="${rows}" placeholder="${esc(placeholder)}">${esc(value||'')}</textarea></div>`;}
+function decisionTip(decision){const tip=decisionTips[decision];return tip?`<div class="decision-tip ${decision}"><strong>${esc(tip.title)}</strong><span>${esc(tip.text)}</span></div>`:'';}
+function repeatedNoteGroups(){
+  if(!caseData||!state)return[];const groups=new Map();for(const r of caseData.rubrics){const f=normalizeFeedback(state.rubrics[r.id]),note=currentDraft(f).note||'',key=normalizedNote(note);if(textLength(note)<12)continue;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(r.id);}return[...groups.values()].filter(ids=>ids.length>1);
+}
+function currentKeepStreak(){
+  if(!caseData)return 0;const index=caseData.rubrics.findIndex(r=>r.id===currentRubricId);let streak=0;for(let i=index;i>=0;i--){if(normalizeFeedback(state.rubrics[caseData.rubrics[i].id]).decision!=='keep')break;streak++;}return streak;
+}
+function currentQualityWarnings(){
+  if(!caseData)return[];const warnings=[],f=normalizeFeedback(state.rubrics[currentRubricId]),d=currentDraft(f),streak=currentKeepStreak();
+  if(f.decision==='keep'&&streak>=5)warnings.push(`你已经连续保留 ${streak} 条。请检查是否存在重复、范围过宽、无法验证或不必要限制实现方式的判据。`);
+  const repeated=repeatedNoteGroups().find(ids=>ids.includes(currentRubricId));if(repeated)warnings.push(`这段判断依据还用于 ${repeated.filter(id=>id!==currentRubricId).join('、')}。请针对当前规则写具体原因。`);
+  if(d.note&&noteIssue(d.note))warnings.push(noteIssue(d.note));return[...new Set(warnings)];
+}
+function renderQualityAlert(){const warnings=currentQualityWarnings(),box=$('qualityAlert');box.hidden=!warnings.length;box.innerHTML=warnings.length?`<ul>${warnings.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'';}
+function renderDynamicFields(f){
+  const d=currentDraft(f);if(!f.decision){$('dynamicFields').innerHTML='<div class="empty-form">先选择保留、修改、建议删除或不确定，页面再显示需要填写的内容。</div>';return;}
+  if(f.decision==='keep')$('dynamicFields').innerHTML=decisionTip('keep')+textareaField('note','判断依据',d.note,'写清对应的题目要求，以及评分人可以通过什么结果验证。');
+  if(f.decision==='revise')$('dynamicFields').innerHTML=decisionTip('revise')+reasonSelect('revise',d.reason_code,'修改原因')+textareaField('note','判断依据',d.note,'说明原规则哪里需要调整，并结合题目或平台任务中的事实。')+textareaField('rewrite','修改后的表述',d.rewrite,'给出可以直接替换原规则的完整表述。',5);
+  if(f.decision==='remove')$('dynamicFields').innerHTML=decisionTip('remove')+reasonSelect('remove',d.reason_code,'删除原因')+textareaField('note','判断依据',d.note,'说明为什么该规则重复、超范围、错误、无法验证或限制实现方式。');
+  if(f.decision==='unsure')$('dynamicFields').innerHTML=decisionTip('unsure')+reasonSelect('unsure',d.reason_code,'无法判断的原因')+textareaField('note','具体说明',d.note,'说明当前信息为什么不足以支持判断。')+textareaField('needed_info','还需要什么信息',d.needed_info,'写清获得哪些信息后才能做出判断。');
+}
+function renderForm(){
+  const r=currentRubric(),f=state.rubrics[r.id]=normalizeFeedback(state.rubrics[r.id]);$('decisionRow').innerHTML=decisionChoices(f.decision);renderDynamicFields(f);renderQualityAlert();$('formStatus').textContent=f.decision?feedbackIssue(f):'';
+  $('decisionRow').querySelectorAll('input[name=current-decision]').forEach(x=>x.addEventListener('change',()=>{f.decision=x.value;normalizeFeedback(f);saveState();renderForm();renderCurrentRule();}));
+  $('dynamicFields').querySelectorAll('[data-field]').forEach(input=>input.addEventListener('input',()=>{const draft=currentDraft(f);draft[input.dataset.field]=input.value;saveState();$('formStatus').textContent=feedbackIssue(f);renderQualityAlert();}));
+}
+function proposedDimensionOptions(selected){const ordered=[...caseData.dimensions.map(d=>({id:d.id,title:d.title||d.id})),...caseData.rubrics.filter(r=>!caseData.dimensions.some(d=>d.id===r.dimension)).map(r=>({id:r.dimension,title:r.dimension_title||r.dimension}))],seen=new Set();return ordered.filter(x=>x.id&&!seen.has(x.id)&&seen.add(x.id)).map(x=>`<option value="${esc(x.id)}" ${selected===x.id?'selected':''}>${esc(x.title)}</option>`).join('');}
+function nextProposedId(){const used=new Set(state.proposed_rubrics.map(x=>x.id));for(let i=1;i<=99;i++){const id=`proposed-${String(i).padStart(2,'0')}`;if(!used.has(id))return id;}return`proposed-${Date.now()}`;}
+function renderProposedRubrics(){
+  if(!caseData||!state)return;document.querySelectorAll('input[name=rubric-gap-status]').forEach(x=>{x.checked=x.value===state.rubric_gap_status;});$('noAdditionPanel').hidden=state.rubric_gap_status!=='complete';$('proposedPanel').hidden=state.rubric_gap_status!=='has_gap';$('noNewRubricReason').value=state.no_new_rubric_reason||'';
+  const list=$('proposedRubricList');list.innerHTML=state.proposed_rubrics.map((raw,index)=>{const p=normalizeProposedRubric(raw,index),issue=proposedRubricIssue(p,index);state.proposed_rubrics[index]=p;return`<article class="proposed-card" data-proposed-index="${index}"><div class="proposed-card-head"><strong>新增 Rubric ${index+1}</strong><button class="btn danger" type="button" data-remove-proposed="${index}">删除</button></div><div class="proposed-grid"><div class="field"><label>评分维度<span class="required"> *</span></label><select data-proposed-field="dimension"><option value="">请选择</option>${proposedDimensionOptions(p.dimension)}</select></div><div class="field"><label>建议权重<span class="required"> *</span></label><select data-proposed-field="weight">${[1,2,3,4,5].map(n=>`<option value="${n}" ${String(p.weight)===String(n)?'selected':''}>${n}</option>`).join('')}</select></div></div><div class="field"><label>完整判据<span class="required"> *</span></label><textarea rows="3" data-proposed-field="statement" placeholder="写成可以直接交给评分人使用的一条完整标准。">${esc(p.statement)}</textarea></div><div class="field"><label>现有规则漏掉了什么<span class="required"> *</span></label><textarea rows="3" data-proposed-field="gap_reason" placeholder="说明它不是对已有规则的改写、拆分或重复。">${esc(p.gap_reason)}</textarea></div><div class="field"><label>对应原始题目的哪项要求<span class="required"> *</span></label><textarea rows="2" data-proposed-field="prompt_requirement" placeholder="引用或概括原始题目中的相关要求。">${esc(p.prompt_requirement)}</textarea></div><div class="field"><label>评分人如何验证<span class="required"> *</span></label><textarea rows="3" data-proposed-field="verification_method" placeholder="写清要查看哪个交付结果，以及满足和不满足时分别是什么样。">${esc(p.verification_method)}</textarea></div><div class="field"><label>权重理由<span class="required"> *</span></label><textarea rows="2" data-proposed-field="weight_reason" placeholder="说明该要求对任务完成质量的重要程度。">${esc(p.weight_reason)}</textarea></div><label class="inline-ack"><input type="checkbox" data-proposed-check="non_duplicate_ack" ${p.non_duplicate_ack?'checked':''}><span>我已对照全部现有规则，确认这条新增 Rubric 不重复，也不是只换了一种说法。</span></label>${issue?`<div class="field-error">${esc(issue)}</div>`:''}</article>`;}).join('')||'<div class="empty-form">还没有新增项。点击“新增一条”开始填写。</div>';
+  $('addProposedRubric').disabled=state.proposed_rubrics.length>=MAX_PROPOSED_RUBRICS;$('addProposedRubric').textContent=state.proposed_rubrics.length>=MAX_PROPOSED_RUBRICS?`已达到 ${MAX_PROPOSED_RUBRICS} 条上限`:'＋ 新增一条';
+  list.querySelectorAll('[data-proposed-field]').forEach(input=>input.addEventListener('input',()=>{const card=input.closest('[data-proposed-index]'),index=Number(card.dataset.proposedIndex);state.proposed_rubrics[index][input.dataset.proposedField]=input.value;saveState();updateProposedStatus();}));list.querySelectorAll('[data-proposed-check]').forEach(input=>input.addEventListener('change',()=>{const card=input.closest('[data-proposed-index]'),index=Number(card.dataset.proposedIndex);state.proposed_rubrics[index][input.dataset.proposedCheck]=input.checked;saveState();updateProposedStatus();}));list.querySelectorAll('[data-remove-proposed]').forEach(button=>button.addEventListener('click',()=>{state.proposed_rubrics.splice(Number(button.dataset.removeProposed),1);saveState();renderProposedRubrics();}));updateProposedStatus();
+}
+function updateProposedStatus(){const issue=additionIssue(),el=$('proposedStatus');el.className=`dialog-status ${issue?'error':''}`;el.textContent=issue||`新增 Rubric 检查已完成${state.rubric_gap_status==='has_gap'?`，共 ${state.proposed_rubrics.length} 条`:''}。`;}
+function renderReview(){renderDirectory(true);renderCurrentRule();renderForm();const index=caseData.rubrics.findIndex(r=>r.id===currentRubricId);$('previousRule').disabled=index<=0;}
+function setCurrentRule(id){if(!caseData.rubrics.some(r=>r.id===id))return;currentRubricId=id;renderReview();}
+function nextSequential(){const index=caseData.rubrics.findIndex(r=>r.id===currentRubricId);if(index<caseData.rubrics.length-1)setCurrentRule(caseData.rubrics[index+1].id);else activateTab('add');}
+function previousRule(){const index=caseData.rubrics.findIndex(r=>r.id===currentRubricId);if(index>0)setCurrentRule(caseData.rubrics[index-1].id);}
+function nextIncomplete(){
+  const start=caseData.rubrics.findIndex(r=>r.id===currentRubricId),ordered=[...caseData.rubrics.slice(start+1),...caseData.rubrics.slice(0,start+1)],target=ordered.find(r=>!feedbackComplete(state.rubrics[r.id]));if(target){activateTab('review');setCurrentRule(target.id);}else activateTab('add');
+}
+function firstMissingField(f){const d=currentDraft(f);if(['revise','remove','unsure'].includes(f.decision)&&!validReason(f.decision,d.reason_code))return'reason_code';if(noteIssue(d.note))return'note';if(f.decision==='revise'&&textLength(d.rewrite)<12)return'rewrite';if(f.decision==='unsure'&&textLength(d.needed_info)<6)return'needed_info';return'';}
+function saveAndNext(){const f=state.rubrics[currentRubricId],issue=feedbackIssue(f);if(issue){$('formStatus').textContent=issue;const field=firstMissingField(normalizeFeedback(f));const missing=field?$('dynamicFields').querySelector(`[data-field="${field}"]`):$('decisionRow').querySelector('input');if(missing)missing.focus();return;}saveState();nextSequential();}
+
+function updateProgress(){
+  if(!caseData||!state)return;const total=caseData.rubrics.length,complete=caseData.rubrics.filter(r=>feedbackComplete(state.rubrics[r.id])).length,invalid=caseData.rubrics.filter(r=>feedbackStatus(state.rubrics[r.id])==='invalid').length,remaining=total-complete,addIssue=additionIssue();$('rubricProgressText').textContent=`${complete} / ${total}`;$('rubricProgress').style.width=`${total?complete/total*100:0}%`;$('rubricTrack').setAttribute('aria-valuenow',complete);$('rubricTrack').setAttribute('aria-valuemin','0');$('rubricTrack').setAttribute('aria-valuemax',total);$('remainingText').textContent=remaining?`还剩 ${remaining} 条未完成`:addIssue?'现有规则已完成，请检查是否需要新增 Rubric':'全部完成，可以导出正式 JSON';$('errorText').textContent=invalid?`${invalid} 条已选择决策但内容不完整`:'';$('floatingNextIncomplete').disabled=false;$('floatingNextIncomplete').textContent=remaining?'下一条未标注':addIssue?'检查新增 Rubric':'查看新增 Rubric';
+}
+function reviewStats(){
+  const counts={keep:0,revise:0,remove:0,unsure:0};if(!caseData)return{total:0,complete:0,counts};let complete=0;for(const r of caseData.rubrics){const f=normalizeFeedback(state.rubrics[r.id]);if(counts[f.decision]!==undefined)counts[f.decision]++;if(feedbackComplete(f))complete++;}return{total:caseData.rubrics.length,complete,counts};
+}
+function qualityWarnings(){
+  if(!caseData)return[];const stats=reviewStats(),warnings=[],repeated=repeatedNoteGroups();
+  if(stats.total>0&&stats.complete===stats.total&&stats.counts.keep===stats.total)warnings.push('全部判据均选择了保留。请再次确认每条原文都无需修改，而不只是方向合理。');
+  else if(stats.complete>=10&&stats.counts.keep/stats.complete>=.9)warnings.push(`当前保留率为 ${Math.round(stats.counts.keep/stats.complete*100)}%。请检查重复、范围过宽、无法验证或不必要限制实现方式的判据。`);
+  if(repeated.length)warnings.push(`检测到 ${repeated.length} 组重复判断依据，请逐条确认内容是否针对当前规则。`);return warnings;
+}
+function requiresQualityAck(){const s=reviewStats();return s.total>0&&s.complete===s.total&&s.counts.keep===s.total;}
+function validation(){if(!caseData)return[];const stats=reviewStats(),incomplete=stats.total-stats.complete,addIssue=additionIssue(),items=[{ok:incomplete===0,level:incomplete===0?'ok':'block',text:incomplete===0?`全部 ${stats.total} 条 rubric 已完成逐条审核`:`还有 ${incomplete} 条 rubric 未完成或依据不够具体`},{ok:!addIssue,level:addIssue?'block':'ok',text:addIssue||`${state.rubric_gap_status==='has_gap'?`已完整填写 ${state.proposed_rubrics.length} 条新增 Rubric`:'已确认现有 Rubric 覆盖完整，无需新增'}`}];for(const text of qualityWarnings())items.push({ok:true,level:'warn',text});items.push({ok:true,level:'ok',text:'任务轨迹和当时的反馈在众测平台查看'},{ok:true,level:'ok',text:'评审人信息由提交表单采集'});return items;}
+function renderValidation(){
+  const stats=reviewStats(),ackNeeded=requiresQualityAck(),ack=$('qualityAck'),addCount=state?.rubric_gap_status==='has_gap'?state.proposed_rubrics.length:0;$('qualityStats').innerHTML=`<span>保留 ${stats.counts.keep}</span><span>修改 ${stats.counts.revise}</span><span>建议删除 ${stats.counts.remove}</span><span>不确定 ${stats.counts.unsure}</span><span>新增 ${addCount}</span>`;$('validationList').innerHTML=validation().map(x=>`<li class="${x.level==='warn'?'warn':x.ok?'ok':'warn'}">${x.level==='warn'||!x.ok?'!':'✓'} ${esc(x.text)}</li>`).join('');if($('additionSummaryTitle')){const issue=additionIssue();$('additionSummaryTitle').textContent=state.rubric_gap_status==='has_gap'?`新增 ${state.proposed_rubrics.length} 条 Rubric`:state.rubric_gap_status==='complete'?'确认无需新增':'尚未检查遗漏规则';$('additionSummaryText').textContent=issue||'新增 Rubric 内容完整，将一并写入导出文件。';}$('qualityAckWrap').hidden=!ackNeeded;if(!ackNeeded)ack.checked=false;const ready=validation().every(x=>x.ok)&&(!ackNeeded||ack.checked);$('exportJson').disabled=!caseData||!ready;
+}
+function resolvedFeedback(r){const f=normalizeFeedback(state.rubrics[r.id]),d=currentDraft(f);return{decision:f.decision||'',reason_code:f.decision==='keep'?'keep_valid':d.reason_code||'',reason_label:f.decision==='keep'?reasonCodes.keep_valid:(reasonCodes[d.reason_code]||''),reason:d.note||'',suggested_text:f.decision==='revise'?d.rewrite||'':'',needed_info:f.decision==='unsure'?d.needed_info||'':''};}
+function exportPayload(draft=false){
+  const checks=validation(),stats=reviewStats(),acknowledged=!requiresQualityAck()||$('qualityAck').checked,proposedCount=state.rubric_gap_status==='has_gap'?state.proposed_rubrics.length:0;return{schema_version:'1.1',feedback_type:'rubric_calibration',workflow_mode:'rubric_review_with_additions',reviewer_app_version:APP_VERSION,exported_at:new Date().toISOString(),draft:!!draft,submission_ready:!draft&&checks.every(x=>x.ok)&&acknowledged,validation:checks,quality_summary:{decision_counts:stats.counts,completed:stats.complete,total:stats.total,warnings:qualityWarnings(),all_keep_acknowledged:requiresQualityAck()?$('qualityAck').checked:null,proposed_rubric_count:proposedCount},task:{task_id:caseData.metadata.task_id,project_id:caseData.metadata.project_id,dataset:caseData.metadata.dataset,prompt_sha256:caseData.metadata.prompt_sha256||caseData.manifest.prompt_sha256||'',case_bundle_name:caseData.packageName,case_bundle_sha256:caseData.packageHash,trace_bundle_name:'',trace_bundle_sha256:'',run_id:''},reviewer:{id:'',name:'',source:'submission_form'},overall:{decision:'',decision_label:'',confidence:'',reason:''},themes:[],rubrics:caseData.rubrics.map(r=>{const f=resolvedFeedback(r);return{id:r.id,dimension:r.dimension,dimension_title:r.dimension_title||r.dimension,tier:r.tier||'',type:r.type||'',weight:r.weight,original_text:r.original_text||r.description||'',plain_text:r.plain_text||'',...f,evidence_refs:[]};}),rubric_additions:{schema_version:'1.0',status:state.rubric_gap_status,status_label:state.rubric_gap_status==='has_gap'?'存在遗漏，需要新增':state.rubric_gap_status==='complete'?'现有 Rubric 已覆盖完整':'尚未确认',no_addition_reason:state.rubric_gap_status==='complete'?state.no_new_rubric_reason:'',count:proposedCount,max_allowed:MAX_PROPOSED_RUBRICS,proposals:state.rubric_gap_status==='has_gap'?state.proposed_rubrics.map((p,index)=>({...normalizeProposedRubric(p,index),weight:Number(p.weight)})):[]}};
+}
+function markdown(payload){const l=['# Rubric 专家反馈','',`- 任务：${payload.task.task_id}`,`- 是否为草稿：${payload.draft?'是':'否'}`,`- 是否可提交：${payload.submission_ready?'是':'否'}`,'','## 逐条审核',''];for(const r of payload.rubrics)l.push(`### ${r.id}`,'',`- 原始判据：${r.original_text||'未提供'}`,`- 结论：${decisions[r.decision]||'未审核'}`,`- 原因分类：${r.reason_label||'无'}`,`- 判断依据：${r.reason||'未填写'}`,`- 修改后的表述：${r.suggested_text||'无'}`,`- 还需要的信息：${r.needed_info||'无'}`,'');l.push('## 新增 Rubric 检查','',`- 结论：${payload.rubric_additions.status_label}`);if(payload.rubric_additions.status==='complete')l.push(`- 无需新增的判断依据：${payload.rubric_additions.no_addition_reason||'未填写'}`);for(const p of payload.rubric_additions.proposals)l.push('',`### ${p.id}`,'',`- 评分维度：${p.dimension}`,`- 完整判据：${p.statement}`,`- 现有规则的缺口：${p.gap_reason}`,`- 对应题目要求：${p.prompt_requirement}`,`- 验证方法：${p.verification_method}`,`- 建议权重：${p.weight}`,`- 权重理由：${p.weight_reason}`);return l.join('\n');}
+function csvCell(v){return`"${String(v??'').replaceAll('"','""')}"`;}function csv(payload){const rows=[['record_type','id','dimension','criterion','decision','reason_code','reason','suggested_text','needed_info','gap_reason','prompt_requirement','verification_method','weight','weight_reason','non_duplicate_ack']];for(const r of payload.rubrics)rows.push(['review',r.id,r.dimension,r.original_text,decisions[r.decision]||'',r.reason_code,r.reason,r.suggested_text,r.needed_info,'','','',r.weight,'','']);for(const p of payload.rubric_additions.proposals)rows.push(['proposed_rubric',p.id,p.dimension,p.statement,'新增','','','','',p.gap_reason,p.prompt_requirement,p.verification_method,p.weight,p.weight_reason,p.non_duplicate_ack]);return'\ufeff'+rows.map(x=>x.map(csvCell).join(',')).join('\n');}
+function downloadBlob(name,blob){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function downloadText(name,type,text){downloadBlob(name,new Blob([text],{type}));$('exportStatus').style.color='var(--green)';$('exportStatus').textContent=`已导出 ${name}`;}
+async function importFeedback(file){
+  assert(caseData,'请先导入任务包。');const data=JSON.parse(await file.text());assert(data.feedback_type==='rubric_calibration','不是 rubric_calibration 反馈文件。');assert(data.task?.task_id===caseData.metadata.task_id,`反馈属于 ${data.task?.task_id||'(未知任务)'}，当前任务是 ${caseData.metadata.task_id}。`);const briefAccepted=state?.review_brief_accepted===true;state=defaultState();state.review_brief_accepted=briefAccepted;for(const r of data.rubrics||[]){const f=normalizeFeedback({decision:r.decision||''});if(f.decision)f.drafts[f.decision]={reason_code:r.reason_code||'',note:r.reason||r.comment||'',rewrite:r.suggested_text||'',needed_info:r.needed_info||''};state.rubrics[r.id]=f;}const additions=data.rubric_additions||{};state.rubric_gap_status=['complete','has_gap'].includes(additions.status)?additions.status:'';state.no_new_rubric_reason=String(additions.no_addition_reason||'');state.proposed_rubrics=Array.isArray(additions.proposals)?additions.proposals.slice(0,MAX_PROPOSED_RUBRICS).map(normalizeProposedRubric):[];currentRubricId=(caseData.rubrics.find(r=>!feedbackComplete(state.rubrics[r.id]))||caseData.rubrics[0]).id;saveState();renderAll();$('recoveryStatus').className='dialog-status';$('recoveryStatus').textContent='已恢复反馈和新增 Rubric。';
+}
+
+function renderAll(){$('emptyWorkspace').hidden=true;$('workspace').classList.add('ready');$('floatingProgress').hidden=false;renderContext();renderReview();updateProgress();renderValidation();syncOperationAvailability();}
+function syncOperationAvailability(){const ready=!!caseData;['feedbackFile','resetFeedback','addRubricAction','exportJson','exportDraftJson','exportMarkdown','exportCsv'].forEach(id=>{const el=$(id);if(el)el.disabled=!ready;});}
+let drawerCloseTimer=0;
+function openRubricDrawer(){if(!caseData)return;clearTimeout(drawerCloseTimer);renderProposedRubrics();const layer=$('newRubricDrawer');layer.hidden=false;layer.setAttribute('aria-hidden','false');document.body.classList.add('drawer-open');requestAnimationFrame(()=>layer.classList.add('open'));requestAnimationFrame(()=>$('newRubricDrawer').querySelector('input:checked, input, button')?.focus());}
+function closeRubricDrawer(immediate=false){const layer=$('newRubricDrawer');if(layer.hidden)return;clearTimeout(drawerCloseTimer);layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.body.classList.remove('drawer-open');const finish=()=>{layer.hidden=true;};if(immediate)finish();else drawerCloseTimer=setTimeout(finish,240);}
+function openDialog(id){const dialog=$(id);if(!dialog)return;syncOperationAvailability();if(id==='exportDialog'){renderValidation();$('exportStatus').className='dialog-status';$('exportStatus').textContent=caseData?'':'请先导入任务评审包。';if(!caseData)$('exportStatus').classList.add('error');}if(id==='recoverDialog'){$('recoveryStatus').className='dialog-status';$('recoveryStatus').textContent=caseData?'':'请先导入任务评审包，再恢复对应任务的进度。';if(!caseData)$('recoveryStatus').classList.add('error');}if(typeof dialog.showModal==='function'&&!dialog.open)dialog.showModal();else dialog.setAttribute('open','');}
+function activateTab(name){if(name==='add'){openRubricDrawer();return;}if(name==='export'){openDialog('exportDialog');return;}if(name==='review'&&caseData){$('panel-review').scrollIntoView({block:'start'});renderDirectory(true);}}
+function init(){
+  syncOperationAvailability();$('promptToggle').addEventListener('click',()=>setPromptExpanded(!$('promptDock').classList.contains('expanded')));$('importAction').addEventListener('click',()=>openDialog('importDialog'));$('emptyImportAction').addEventListener('click',()=>openDialog('importDialog'));$('recoverAction').addEventListener('click',()=>openDialog('recoverDialog'));$('addRubricAction').addEventListener('click',openRubricDrawer);$('exportAction').addEventListener('click',()=>openDialog('exportDialog'));document.querySelectorAll('[data-close-dialog]').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));document.querySelectorAll('[data-close-drawer]').forEach(b=>b.addEventListener('click',()=>closeRubricDrawer()));$('newRubricDrawer').addEventListener('click',e=>{if(e.target===$('newRubricDrawer'))closeRubricDrawer();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('newRubricDrawer').hidden)closeRubricDrawer();});document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d&&d.id!=='reviewBriefDialog')d.close();}));$('reviewBriefDialog').addEventListener('cancel',e=>e.preventDefault());document.querySelectorAll('.brief-check').forEach(x=>x.addEventListener('change',()=>{$('acceptBrief').disabled=![...document.querySelectorAll('.brief-check')].every(box=>box.checked);}));$('acceptBrief').addEventListener('click',()=>{if($('acceptBrief').disabled||!state)return;state.review_brief_accepted=true;saveState();$('reviewBriefDialog').close();});$('qualityAck').addEventListener('change',renderValidation);$('caseFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)handleCaseFile(f).finally(()=>{e.target.value='';})});$('directorySearch').addEventListener('input',renderDirectory);$('directoryStatus').addEventListener('input',renderDirectory);$('previousRule').addEventListener('click',previousRule);$('saveAndNext').addEventListener('click',saveAndNext);$('nextIncomplete').addEventListener('click',nextIncomplete);$('floatingNextIncomplete').addEventListener('click',nextIncomplete);$('jumpExport').addEventListener('click',()=>activateTab('export'));$('editProposedRubrics').addEventListener('click',()=>{$('exportDialog').close();activateTab('add');});document.querySelectorAll('input[name=rubric-gap-status]').forEach(input=>input.addEventListener('change',()=>{state.rubric_gap_status=input.value;if(input.value==='has_gap'&&!state.proposed_rubrics.length)state.proposed_rubrics.push(emptyProposedRubric(nextProposedId()));saveState();renderProposedRubrics();}));$('noNewRubricReason').addEventListener('input',e=>{state.no_new_rubric_reason=e.target.value;saveState();updateProposedStatus();});$('addProposedRubric').addEventListener('click',()=>{if(state.proposed_rubrics.length>=MAX_PROPOSED_RUBRICS)return;state.rubric_gap_status='has_gap';state.proposed_rubrics.push(emptyProposedRubric(nextProposedId()));saveState();renderProposedRubrics();});$('finishProposedRubrics').addEventListener('click',()=>{const issue=additionIssue();updateProposedStatus();if(issue)return;closeRubricDrawer(true);openDialog('exportDialog');});
+  $('exportJson').addEventListener('click',()=>{const p=exportPayload(false);if(!p.submission_ready){$('exportStatus').style.color='var(--red)';$('exportStatus').textContent=requiresQualityAck()&&!$('qualityAck').checked?'请先完成全部保留的额外确认。':additionIssue()||'不能导出正式反馈：请先完成全部规则并补充具体依据。';return;}downloadText(`${p.task.task_id}_rubric_feedback.json`,'application/json;charset=utf-8',JSON.stringify(p,null,2));});$('exportDraftJson').addEventListener('click',()=>{const p=exportPayload(true);downloadText(`${p.task.task_id}_rubric_feedback_draft.json`,'application/json;charset=utf-8',JSON.stringify(p,null,2));});$('exportMarkdown').addEventListener('click',()=>{const draft=!validation().every(x=>x.ok),p=exportPayload(draft);downloadText(`${p.task.task_id}_rubric_feedback${draft?'_draft':''}.md`,'text/markdown;charset=utf-8',markdown(p));});$('exportCsv').addEventListener('click',()=>{const draft=!validation().every(x=>x.ok),p=exportPayload(draft);downloadText(`${p.task.task_id}_rubric_feedback${draft?'_draft':''}.csv`,'text/csv;charset=utf-8',csv(p));});
+  $('feedbackFile').addEventListener('change',async e=>{try{const f=e.target.files[0];if(f)await importFeedback(f)}catch(err){$('recoveryStatus').textContent=err.message;$('recoveryStatus').className='dialog-status error';}finally{e.target.value='';}});$('resetFeedback').addEventListener('click',()=>{if(!caseData||!confirm('确定清空当前任务的全部反馈吗？'))return;localStorage.removeItem(storageKey());state=defaultState();state.review_brief_accepted=true;currentRubricId=caseData.rubrics[0].id;renderAll();$('recoveryStatus').className='dialog-status';$('recoveryStatus').textContent='已清空当前任务的本地反馈。';});
+}
+init();
+</script>
+</body>
+</html>
